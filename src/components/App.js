@@ -12,7 +12,6 @@ import { Deck } from "./Deck";
 import { CardsFeed } from "./CardsFeed";
 import { ManaCurve } from "./ManaCurve";
 import { CardFilter } from "./CardFilter";
-
 import cards from "../cards.json";
 
 function App() {
