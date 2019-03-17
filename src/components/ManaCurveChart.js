@@ -36,7 +36,7 @@ const calc = deck => {
 };
 const memoCalc = memoizeOne(calc);
 
-export class ManaCurveChart extends React.Component {
+export default class ManaCurveChart extends React.Component {
 	render() {
 		const data = memoCalc(this.props.deck);
 
