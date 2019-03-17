@@ -1,7 +1,7 @@
 import React from "react";
 import { Card } from "semantic-ui-react";
 import { SingleCard } from "./SingleCard";
-export class CardsFeed extends React.Component {
+export class CardsFeed extends React.PureComponent {
 	render() {
 		return (
 			<Card.Group>
@@ -9,7 +9,6 @@ export class CardsFeed extends React.Component {
 					<SingleCard
 						key={card.id}
 						card={card}
-						deck={this.props.deck}
 						cardsInFeed={this.props.cardsInFeed}
 						quantity={this.props.deck.quantity[card.id]}
 						addToDeck={this.props.addToDeck}
