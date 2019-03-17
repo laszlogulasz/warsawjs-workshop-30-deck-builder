@@ -1,9 +1,10 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import "semantic-ui-css/semantic.min.css";
-import _ from "lodash";
+import omit from "lodash/omit";
+import filter from "lodash/filter";
 import Fuse from "fuse.js";
 import { Grid, Container, Divider, Header } from "semantic-ui-react";
-
+import axios from "axios";
 import { CRAFTING_COST } from "../cards-rarity-config";
 import { UsedMechanics } from "./UsedMechanics";
 import { DeckStatistics } from "./DeckStatistics";
@@ -12,20 +13,29 @@ import { Deck } from "./Deck";
 import { CardsFeed } from "./CardsFeed";
 import { ManaCurve } from "./ManaCurve";
 import { CardFilter } from "./CardFilter";
-import cards from "../cards.json";
+//import cards from "../cards.json";
 
 function App() {
-	const [selectedHeroClass, setHeroClass] = useState("MAGE");
-	const [searchText, setSearchText] = useState("hodowca");
+	const [selectedHeroClass, setHeroClass] = useState("");
+	const [searchText, setSearchText] = useState("");
 	const [highlightMechanic, setHighlightMechanic] = useState("");
 	const [deck, setDeck] = useState({ cards: [], quantity: {} });
 	const [isManaVisible, setManaVisible] = useState(false);
 	const [cardsTypeFilter, setCardsTypeFilter] = useState("ALL");
+	const [cards, setCards] = useState([]);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const result = await axios(process.env.PUBLIC_URL + "/cards.json");
+			setCards(result.data);
+		};
+		fetchData();
+	}, []);
 
 	const availableCards = useMemo(() => {
 		console.log("availableCards");
-		return selectedHeroClass
-			? _.filter(
+		return selectedHeroClass && cards.length > 0
+			? filter(
 					cards,
 					c => c.cardClass === selectedHeroClass || c.cardClass === "NEUTRAL"
 			  )
@@ -35,7 +45,7 @@ function App() {
 	const cardFilteredByType = useMemo(() => {
 		console.log("cardFilteredByType");
 		return cardsTypeFilter !== "ALL"
-			? _.filter(availableCards, c => c.type === cardsTypeFilter)
+			? filter(availableCards, c => c.type === cardsTypeFilter)
 			: availableCards;
 	}, [cardsTypeFilter, availableCards]);
 
@@ -91,7 +101,7 @@ function App() {
 			const quantity = deck.quantity[card.id]
 				? Object.assign(deck.quantity, { [card.id]: 2 })
 				: Object.assign(deck.quantity, { [card.id]: 1 });
-			const cards = _.filter(availableCards, c => quantity[c.id]).sort(
+			const cards = filter(availableCards, c => quantity[c.id]).sort(
 				(a, b) => a.cost - b.cost
 			);
 			setDeck({ cards, quantity });
@@ -103,8 +113,8 @@ function App() {
 		const quantity =
 			deck.quantity[id] === 2
 				? Object.assign(deck.quantity, { [id]: 1 })
-				: _.omit(deck.quantity, [id]);
-		const cards = _.filter(availableCards, c => quantity[c.id]).sort(
+				: omit(deck.quantity, [id]);
+		const cards = filter(availableCards, c => quantity[c.id]).sort(
 			(a, b) => a.cost - b.cost
 		);
 		setDeck({ cards, quantity });
